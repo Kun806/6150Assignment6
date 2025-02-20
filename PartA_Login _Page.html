@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <!-- Include jQuery from CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 3px;
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label>Email:</label>
+            <input type="text" id="email" name="email" />
+            <div id="emailError" class="error"></div>
+
+            <label>Username:</label>
+            <input type="text" id="username" name="username" />
+            <div id="usernameError" class="error"></div>
+
+            <label>Password:</label>
+            <input type="password" id="password" name="password" />
+            <div id="passwordError" class="error"></div>
+
+            <label>Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" />
+            <div id="confirmPasswordError" class="error"></div>
+
+            <button type="submit" id="loginButton" disabled>Login</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Validate Northeastern email address.
+            function validateEmail(email) {
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@northeastern\.edu$/;
+                return emailRegex.test(email);
+            }
+            // Validate username: only letters, 3-15 characters.
+            function validateUsername(username) {
+                const usernameRegex = /^[a-zA-Z]{3,15}$/;
+                return usernameRegex.test(username);
+            }
+            // Validate password: length between 6 and 20 characters.
+            function validatePassword(password) {
+                return password.length >= 6 && password.length <= 20;
+            }
+            // Run all validations and enable/disable login button.
+            function validateForm() {
+                let valid = true;
+                const email = $("#email").val().trim();
+                if (email === "") {
+                    $("#emailError").text("Email is required.");
+                    valid = false;
+                } else if (!validateEmail(email)) {
+                    $("#emailError").text("Enter a valid Northeastern email address.");
+                    valid = false;
+                } else { $("#emailError").text(""); }
+
+                const username = $("#username").val().trim();
+                if (username === "") {
+                    $("#usernameError").text("Username is required.");
+                    valid = false;
+                } else if (!validateUsername(username)) {
+                    $("#usernameError").text("Username must be 3-15 letters only.");
+                    valid = false;
+                } else { $("#usernameError").text(""); }
+
+                const password = $("#password").val();
+                if (password === "") {
+                    $("#passwordError").text("Password is required.");
+                    valid = false;
+                } else if (!validatePassword(password)) {
+                    $("#passwordError").text("Password must be 6-20 characters long.");
+                    valid = false;
+                } else { $("#passwordError").text(""); }
+
+                const confirmPassword = $("#confirmPassword").val();
+                if (confirmPassword === "") {
+                    $("#confirmPasswordError").text("Confirm your password.");
+                    valid = false;
+                } else if (password !== confirmPassword) {
+                    $("#confirmPasswordError").text("Passwords do not match.");
+                    valid = false;
+                } else { $("#confirmPasswordError").text(""); }
+
+                $("#loginButton").prop("disabled", !valid);
+            }
+
+            // Validate on keyup or change.
+            $("#email, #username, #password, #confirmPassword").on("keyup change", validateForm);
+
+            // On successful login, store the username and redirect.
+            $("#loginForm").submit(function (e) {
+                e.preventDefault();
+                if (!$("#loginButton").prop("disabled")) {
+                    localStorage.setItem("loggedInUser", $("#username").val().trim());
+                    window.location.href = "calculator.html";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

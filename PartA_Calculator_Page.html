@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+    <!-- Include jQuery from CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        #result {
+            background: #e9ecef;
+        }
+
+        .user {
+            text-align: right;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="user">Welcome, <span id="displayUsername"></span></div>
+        <h2>Simple Calculator</h2>
+        <form id="calcForm">
+            <label>Number 1:</label>
+            <input type="text" id="num1" name="num1" />
+            <div id="num1Error" class="error"></div>
+
+            <label>Number 2:</label>
+            <input type="text" id="num2" name="num2" />
+            <div id="num2Error" class="error"></div>
+
+            <div>
+                <button type="button" id="add">Add</button>
+                <button type="button" id="subtract">Subtract</button>
+                <button type="button" id="multiply">Multiply</button>
+                <button type="button" id="divide">Divide</button>
+            </div>
+
+            <label>Result:</label>
+            <input type="text" id="result" name="result" readonly />
+            <div id="resultError" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Display the username saved during login.
+            const username = localStorage.getItem("loggedInUser") || "User";
+            $("#displayUsername").text(username);
+
+            // Validate a number input field.
+            function validateNumber(input, errorSelector) {
+                const value = $(input).val().trim();
+                if (value === "") {
+                    $(errorSelector).text("This field is required.");
+                    return false;
+                }
+                if (isNaN(value)) {
+                    $(errorSelector).text("Enter a valid number.");
+                    return false;
+                }
+                if (!/^-?\d+(\.\d+)?$/.test(value)) {
+                    $(errorSelector).text("Only numeric values are allowed.");
+                    return false;
+                }
+                const numVal = Number(value);
+                if (!isFinite(numVal)) {
+                    $(errorSelector).text("Infinite value is not allowed.");
+                    return false;
+                }
+                $(errorSelector).text("");
+                return true;
+            }
+
+            // Single arrow function to perform add, subtract, multiply, and divide.
+            const calculate = (num1, num2, operator) => {
+                switch (operator) {
+                    case "add":
+                        return num1 + num2;
+                    case "subtract":
+                        return num1 - num2;
+                    case "multiply":
+                        return num1 * num2;
+                    case "divide":
+                        if (num2 === 0) throw new Error("Division by zero is not allowed.");
+                        return num1 / num2;
+                    default:
+                        return null;
+                }
+            };
+
+            // Handle each calculator button click.
+            $("button").click(function () {
+                const operator = $(this).attr("id");
+                const validNum1 = validateNumber("#num1", "#num1Error");
+                const validNum2 = validateNumber("#num2", "#num2Error");
+
+                if (validNum1 && validNum2) {
+                    const num1 = parseFloat($("#num1").val().trim());
+                    const num2 = parseFloat($("#num2").val().trim());
+                    try {
+                        const res = calculate(num1, num2, operator);
+                        $("#result").val(res);
+                        $("#resultError").text("");
+                    } catch (e) {
+                        $("#resultError").text(e.message);
+                        $("#result").val("");
+                    }
+                } else {
+                    $("#result").val("");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

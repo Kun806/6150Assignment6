@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .time-display {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        input[type="date"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            pointer-events: none;
+            /* Make the date picker non-editable */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Stopwatch</h2>
+        <div class="time-display" id="timeDisplay">00:00:00</div>
+        <input type="date" id="datePicker" readonly />
+        <div>
+            <button id="start">Start</button>
+            <button id="stop">Stop</button>
+            <button id="reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let intervalId;
+        let startTime;
+        let elapsed = 0;
+
+        // Utility to format milliseconds as HH:MM:SS.
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // A simple delay function using Promises.
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Start button: uses async/await with setInterval for updating the display.
+        document.getElementById("start").addEventListener("click", async function () {
+            if (intervalId) return; // already running
+            startTime = Date.now() - elapsed; // resume from previous elapsed time
+            intervalId = setInterval(() => {
+                elapsed = Date.now() - startTime;
+                document.getElementById("timeDisplay").innerText = formatTime(elapsed);
+            }, 1000);
+        });
+
+        // Stop button: pauses the stopwatch.
+        document.getElementById("stop").addEventListener("click", function () {
+            clearInterval(intervalId);
+            intervalId = null;
+        });
+
+        // Reset button: stops and resets the stopwatch.
+        document.getElementById("reset").addEventListener("click", function () {
+            clearInterval(intervalId);
+            intervalId = null;
+            elapsed = 0;
+            document.getElementById("timeDisplay").innerText = "00:00:00";
+        });
+
+        // Initialize the date picker with today's date (non-editable).
+        document.getElementById("datePicker").valueAsDate = new Date();
+    </script>
+</body>
+
+</html>
